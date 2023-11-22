@@ -1,0 +1,252 @@
+<style>
+@font-face{font-family:"Marr Medium";src:url(fonts/MarrSansCondensed-Medium-Web.f3ebb2c.woff2) format("woff2");font-style:normal}
+@font-face{font-family:"Marr Semibold";src:url(fonts/MarrSansCondensed-Semibold-Web.3f711f8.woff2) format("woff2");font-style:normal}
+@font-face{font-family:"GT America";src:url(fonts/GT-America-Standard-Regular.933df29.woff2) format("woff2");font-style:normal}
+@font-face{font-family:"GT America Bold";src:url(fonts/GT-America-Standard-Bold.74dfe31.woff2) format("woff2");font-style:normal}
+@font-face{font-family:"GT America Italic";src:url(fonts/GT-America-Standard-Regular-Italic.244f879.woff2) format("woff2");font-style:normal}
+
+    html, body {
+  height:100%;
+    background: #AFFFBB;
+}
+
+.height-100 {
+  height: 100%;
+}
+body {
+    margin:0;
+    font-family: "Marr Semibold", sans-serif;
+    font-size: 16px;
+    line-height: 1.15;
+}
+#container {
+    display:flex;
+    flex-direction: column;
+    background: #AFFFBB;
+    margin:0;
+    padding:20px;
+    align-items: center;
+    justify-items: center;
+    height: 100%;
+    box-sizing: border-box;
+}
+header {
+    position: fixed;
+    top: 0;
+    box-sizing: border-box;
+    width: 100%;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    z-index: 1;
+    backdrop-filter: blur(10px);
+    background: rgba(175,255,187,0.6);
+}
+.intro {
+    display:flex;
+    padding: 20px;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.intro p {
+    display: block;
+    width: 20%;
+    margin: 0;
+    padding: 0;
+}
+#logo {
+    width: 20%;
+}
+.buttons {
+    border-top: 1px solid black;
+    padding: 20px;
+}
+button {
+    font-family: "Marr Semibold", sans-serif;
+    font-size: 24px;
+    line-height: 0.94;
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+#grid {
+  margin-top: 160px;
+  width: 100%;
+    position: relative;
+    height: 100%;
+}
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+section {
+    position: absolute;
+}
+.tile {
+	width: 100%;
+	height: 100%;
+    transform-style: preserve-3d;
+    transform: scaleY(0);
+	/* transition: height .3s ease-in-out; */
+    transform-origin: top;
+	transition: transform .3s ease-in-out;
+	position: absolute;
+    background-color:cyan;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.tile h2 {
+    margin: 0;
+    padding: 1vw;
+    box-sizing: border-box;;
+    font-size: 11vw;
+    line-height: 7vw;
+    padding-bottom: 0;
+}
+.tile.size2 h2 {
+    font-size: 22vw;
+    line-height: 14vw;
+}
+.tile p {
+    margin: 0;
+    padding: 1vw;
+    font-size: 2vw;
+    box-sizing: border-box;
+}
+.tile.size2 p {
+    font-size: 4vw;
+}
+img {
+    width: 100%;
+    height: auto;
+}
+.bigImage {
+    position: absolute;
+    z-index: 3;
+}
+/* section:hover {
+	transform: rotateX(.5turn);
+} */
+section.active .tile {
+	/* height: 100%; */
+    transform: scaleY(1)
+}
+
+</style>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<header>
+    <div class="intro">
+        <p>Here's to the impact we've made in 2023— and more in '24!</p>
+        <img id="logo" src="img/logo.svg" />
+    </div>
+    <div class="buttons">
+        <button id="impactArea1">Impact area 1</button>
+        <button id="impactArea2">Impact area 2</button>
+        <button id="impactArea3">Impact area 3</button>
+        <button id="impactArea4">Impact area 4</button>
+    </div>
+</header>
+<div id="container">
+    <div id="grid"></div>
+</div>
+
+<script>
+    let width = 5;
+    let cellWidth, cellHeight;
+    function stat(number,text) {
+        return `<h2>`+number+`</h2><p>`+text+`</p>`
+    }
+    function circle(colour, size = 1) {
+        return `<svg height="100%" width="100%">
+            <circle 
+                class="bigCircle"
+                size="`+size+`"
+                cx="`+(cellWidth*size/2).toFixed(2)+`" 
+                cy="`+(cellWidth*size/2).toFixed(2)+`" 
+                r="`+(cellWidth*size/2).toFixed(2)+`" 
+                fill="`+colour+`" />
+        </svg>`
+    }
+    function createBlock(x,y,size,backgroundColour,content="") {
+        let section = $(
+                `<section size="`+size+`" x="`+x+`" y="`+y+`" id="`+y+`-`+x+`">
+                    <div class="tile size`+size+`" style="background-color:`+backgroundColour+`">
+                        `+content+`
+                    </div>
+                </section>`)
+            .css("width", cellWidth*size)
+            .css("height", cellHeight*size)
+            .css("left", (x*cellWidth)+"px")
+            .css("top", (y*cellHeight)+"px")
+            $("#grid").append(section);
+            setTimeout(() => {
+                $("#"+y+"-"+x).addClass("active")
+            }, 5)
+    }
+    $(window).on("resize", () => {
+        cellWidth = Math.floor($("#container").width()/width)
+        cellHeight = cellWidth
+        $('#grid').css({
+            'margin-top': $('header').height()
+        });
+        $(".bigCircle").each((index, element) => {
+            let size = $(element).attr("size")
+            $(element).attr("cx", (cellWidth*size/2).toFixed(2))
+                    .attr("cy", (cellWidth*size/2).toFixed(2))
+                    .attr("r", (cellWidth*size/2).toFixed(2))
+        });
+        $("section").each((index, element) => {
+            let x = $(element).attr("x")
+            let y = $(element).attr("y")
+            let size = $(element).attr("size")
+            $(element).css("width", cellWidth*size)
+                .css("height", cellHeight*size)
+                .css("left", (x*cellWidth)+"px")
+                .css("top", (y*cellHeight)+"px")
+        });
+    });
+$(document).ready(() => {
+    // INITIALISE SIZE
+    cellWidth = Math.floor($("#container").width()/width)
+    cellHeight = cellWidth
+    $('#grid').css({
+        'margin-top': $('header').height()
+    });
+    $(".buttons button").on("click", () => {
+        $("html, body").stop().animate({scrollTop:0}, 500, 'swing');
+    })
+    $("#impactArea1").on("click", () => {
+        $("section").removeClass("active");
+        setTimeout(() => {
+            $("#grid").html("")
+            createBlock(0,0,1,"black", circle("white", 1));
+            createBlock(0,1,2,"#2436FF", stat("42","people who got excited"));
+            createBlock(1,2,1,"transparent", circle("#FF4F00", 1));
+            createBlock(3,2,2,"#827184");
+            createBlock(2,5,1,"#827184");
+        }, 300)
+    })
+    $("#impactArea2").on("click", () => {
+        $("section").removeClass("active");
+        setTimeout(() => {
+            $("#grid").html("")
+            createBlock(2,0,1);
+            createBlock(2,1,2);
+            createBlock(3,1,2);
+            createBlock(1,5,2);
+        }, 300)
+    })
+    $("#impactArea3").on("click", () => {
+        $("section").removeClass("active");
+        setTimeout(() => {
+            $("#grid").html("")
+            createBlock(1,2,1);
+            createBlock(1,1,2);
+            createBlock(1,3,1);
+            createBlock(4,2,2);
+        }, 300)
+    })
+})
+</script>
+

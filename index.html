@@ -1,0 +1,412 @@
+<style>
+@font-face{font-family:"Marr Medium";src:url(fonts/MarrSansCondensed-Medium-Web.f3ebb2c.woff2) format("woff2");font-style:normal}
+@font-face{font-family:"Marr Semibold";src:url(fonts/MarrSansCondensed-Semibold-Web.3f711f8.woff2) format("woff2");font-style:normal}
+@font-face{font-family:"GT America";src:url(fonts/GT-America-Standard-Regular.933df29.woff2) format("woff2");font-style:normal}
+@font-face{font-family:"GT America Bold";src:url(fonts/GT-America-Standard-Bold.74dfe31.woff2) format("woff2");font-style:normal}
+@font-face{font-family:"GT America Italic";src:url(fonts/GT-America-Standard-Regular-Italic.244f879.woff2) format("woff2");font-style:normal}
+
+    html, body {
+  height:100%;
+    background: #AFFFBB;
+}
+
+.height-100 {
+  height: 100%;
+}
+body {
+    margin:0;
+    font-family: "Marr Semibold", sans-serif;
+    font-size: 16px;
+    line-height: 1.15;
+}
+#container {
+    display:flex;
+    flex-direction: column;
+    background: #AFFFBB;
+    margin:0;
+    padding:20px;
+    align-items: center;
+    justify-items: center;
+    height: 100%;
+    box-sizing: border-box;
+    max-width:900px;
+    margin: 0 auto;
+}
+header {
+    position: fixed;
+    top: 0;
+    box-sizing: border-box;
+    width: 100%;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    z-index: 1;
+    backdrop-filter: blur(10px);
+    background: rgba(175,255,187,0.6);
+}
+.intro {
+    display:flex;
+    padding: 20px;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.intro p {
+    display: block;
+    width: 20%;
+    margin: 0;
+    padding: 0;
+}
+#logo {
+    width: 20%;
+}
+.buttons {
+    border-top: 1px solid black;
+    padding: 20px;
+}
+button {
+    font-family: "Marr Semibold", sans-serif;
+    font-size: 24px;
+    line-height: 0.94;
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+#grid {
+    margin-bottom: 160px;
+    width: 100%;
+    position: relative;
+    height: 100%;
+}
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+section {
+    position: absolute;
+    margin-bottom: 120px;
+}
+.tile {
+	width: 100%;
+	height: 100%;
+    transform-style: preserve-3d;
+    /* transform: scaleY(0); */
+	/* transition: height .3s ease-in-out; */
+	/* transition: transform .3s ease-in-out; */
+	position: absolute;
+    background-color:cyan;
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.origin-left {
+    transform-origin: left;
+}
+.origin-right {
+    transform-origin: right;
+}
+.origin-top {
+    transform-origin: top;
+}
+.origin-bottom {
+    transform-origin: bottom;
+}
+.tile h2 {
+    margin: 0;
+    padding: 1vw;
+    box-sizing: border-box;;
+    font-size: 11vw;
+    line-height: 7vw;
+    padding-bottom: 0;
+}
+.tile.size2 h2 {
+    font-size: 22vw;
+    line-height: 14vw;
+}
+.tile p {
+    margin: 0;
+    padding: 1vw;
+    font-size: 2vw;
+    box-sizing: border-box;
+}
+.tile.size2 p {
+    font-size: 4vw;
+}
+img {
+    width: 100%;
+    height: auto;
+}
+.bigImage {
+    position: absolute;
+    z-index: 3;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+}
+footer #scroll {
+    border: 1px solid black;
+    backdrop-filter: blur(10px);
+    background: rgba(175,255,187,0.6);
+    padding: 20px;
+}
+
+</style>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<header>
+    <div class="intro">
+        <p>Here's to the impact we've made in 2023— and more in '24!</p>
+        <img id="logo" src="img/logo.svg" />
+    </div>
+    <div class="buttons">
+        <button id="impactArea1">All</button>
+        <button id="impactArea2">Climate</button>
+        <button id="impactArea3">Energy</button>
+        <button id="impactArea4">Other</button>
+    </div>
+</header>
+<div id="container">
+    <div id="grid"></div>
+</div>
+<footer>
+    <div id="scroll">Scroll for more impact ⬇</div>
+</footer>
+
+<script>
+    let animations = ["scaleX", "scaleY",  "rotate","fade"]
+    // let origins = ["top", "bottom",  "left","right"]
+    let origins = ["top", "left"]
+    let width = 5;
+    let duration = 300;
+    let cellWidth, cellHeight;
+    function buildDefaultImpactArea() {
+        setTimeout(() => {
+            $("#grid").html("")
+            createBlock(0,0,1,"black", circle("white", 1));
+            createBlock(0,1,2,"#827184", stat("112","codesign workshops"));
+            createBlock(3,3,1,"#2436FF", stat("52","websites launched"));
+            createBlock(1,4,1,"#FF4F00", stat("12","impact areas impacted"));
+            createBlock(2,5,2,"#FFCBD4", stat("27","awards won"));
+            createBlock(2,2,1,"transparent", circle("#FF4F00", 1));
+            createBlock(3,1,2,"transparent", `<img src="img/test.png" />`);
+            createBlock(4,5,1,"transparent", `<img src="img/test.png" />`);
+            createBlock(2,5,1,"#827184");
+        }, duration)
+    }
+    function animateInBlock(x,y) {
+        let animation = $("#"+y+"-"+x+" .tile").attr("animation")
+        switch(animation) {
+                    case "scaleX":
+                        $("#"+y+"-"+x+" .tile").css("transform", "scaleX(0)");
+                        $("#"+y+"-"+x+" .tile").css("display", "flex");
+                        $("#"+y+"-"+x+" .tile").animate({value: 1},
+                            {duration:duration,
+                            step: function(now, fx) {
+                                $(this).css('transform','scaleX('+now+')')}
+                            })
+                        break 
+                    case "scaleY":
+                        $("#"+y+"-"+x+" .tile").css("transform", "scaleY(0)");
+                        $("#"+y+"-"+x+" .tile").css("display", "flex");
+                        $("#"+y+"-"+x+" .tile").animate({transform: 1},
+                            {duration:duration,
+                            step: function(now, fx) {
+                                $(this).css('transform','scaleY('+now+')')}
+                            })
+                        break 
+                    case "rotate":
+                        $("#"+y+"-"+x+" .tile").css("transform", "rotate(-30deg)").css("opacity", 0);
+                        $("#"+y+"-"+x+" .tile").css("display", "flex");
+                        $("#"+y+"-"+x+" .tile").animate({transform: 1},
+                            {duration:duration,
+                            step: function(now, fx) {
+                                $(this).css('transform','rotate('+(1-now) * -30+'deg)').css('opacity',now)
+                            }
+                            })
+                        break 
+                    case "fade":
+                    default:
+                        $("#"+y+"-"+x+" .tile").css("opacity", 0);
+                        $("#"+y+"-"+x+" .tile").css("display", "flex");
+                        $("#"+y+"-"+x+" .tile").animate({opacity: 1},
+                            {duration:duration,
+                            step: function(now, fx) {
+                                $(this).css('opacity',now)}
+                            })
+                        break 
+                }
+    }
+    function animateOutBlock(x,y) {
+        let animation = $("#"+y+"-"+x+" .tile").attr("animation")
+        switch(animation) {
+                    case "scaleX":
+                        $("#"+y+"-"+x+" .tile").animate({value: 0},
+                            {duration:duration,
+                            step: function(now, fx) {
+                                console.log(now, duration)
+                                $(this).css('transform','scaleX('+(now)+')')
+                            }, 
+                            complete: () => {
+                                $(this).css("transform", "scaleX(0)");
+                                $(this).css("display", "none");
+                            }
+                            },)
+                        break 
+                    case "scaleY":
+                        $("#"+y+"-"+x+" .tile").animate({value: 1},
+                            {duration:duration,
+                            step: function(now, fx) {
+                                console.log(now, duration)
+                                $(this).css('transform','scaleY('+(1-now)+')')
+                            }, 
+                            complete: () => {
+                                $(this).css("transform", "scaleY(0)");
+                                $(this).css("display", "none");
+                            }
+                            },)
+                        break 
+                    case "rotate":
+                        $("#"+y+"-"+x+" .tile").animate({value: 1},
+                            {duration:duration,
+                            step: function(now, fx) {
+                                console.log(now, duration)
+                                $(this).css('transform','rotate('+(now)*-30+'deg)').css('opacity',1-now)
+                            }, 
+                            complete: () => {
+                                $(this).css("transform", "rotate(-90deg)").css("opacity", 0);
+                                $(this).css("display", "none");
+                            }
+                        },)
+                        break 
+                    case "fade":
+                    default:
+                        $("#"+y+"-"+x+" .tile").animate({value: 1},
+                            {duration:duration,
+                            step: function(now, fx) {
+                                console.log(now, duration)
+                                $(this).css('opacity',1-now)
+                            }, 
+                            complete: () => {
+                                $(this).css("opacity", 0);
+                                $(this).css("display", "none");
+                            }
+                        },)
+                        break 
+                }
+    }
+    function stat(number,text) {
+        return `<h2>`+number+`</h2><p>`+text+`</p>`
+    }
+    function circle(colour, size = 1) {
+        return `<svg height="100%" width="100%">
+            <circle 
+                class="bigCircle"
+                size="`+size+`"
+                cx="`+(cellWidth*size/2).toFixed(2)+`" 
+                cy="`+(cellWidth*size/2).toFixed(2)+`" 
+                r="`+(cellWidth*size/2).toFixed(2)+`" 
+                fill="`+colour+`" />
+        </svg>`
+    }
+    function createBlock(x,y,size,backgroundColour,content="") {
+        
+        let animation = animations[Math.floor(Math.random() * animations.length)]
+        let origin = origins[Math.floor(Math.random() * animations.length)]
+        let section = $(
+                `<section size="`+size+`" x="`+x+`" y="`+y+`" id="`+y+`-`+x+`">
+                    <div class="tile size`+size+` origin-`+origin+`" animation="`+animation+`" style="background-color:`+backgroundColour+`">
+                        `+content+`
+                    </div>
+                </section>`)
+            .css("width", cellWidth*size)
+            .css("height", cellHeight*size)
+            .css("left", (x*cellWidth)+"px")
+            .css("top", (y*cellHeight)+"px")
+            $("#grid").append(section);
+            setTimeout(() => {
+                animateInBlock(x,y)
+            }, Math.floor(Math.random() * duration ))
+    }
+    $(window).on("scroll", () => {
+        if($(window).scrollTop() + $(window).height() == $(document).height()) {
+            $("footer").fadeOut()
+        } else {
+            $("footer").fadeIn()
+        }
+    })
+    $(window).on("resize", () => {
+        cellWidth = Math.floor($("#container").width()/width)
+        cellHeight = cellWidth
+        $('#grid').css({
+            'margin-top': $('header').height()
+        });
+        $(".bigCircle").each((index, element) => {
+            let size = $(element).attr("size")
+            $(element).attr("cx", (cellWidth*size/2).toFixed(2))
+                    .attr("cy", (cellWidth*size/2).toFixed(2))
+                    .attr("r", (cellWidth*size/2).toFixed(2))
+        });
+        $("section").each((index, element) => {
+            let x = $(element).attr("x")
+            let y = $(element).attr("y")
+            let size = $(element).attr("size")
+            $(element).css("width", cellWidth*size)
+                .css("height", cellHeight*size)
+                .css("left", (x*cellWidth)+"px")
+                .css("top", (y*cellHeight)+"px")
+        });
+    });
+$(document).ready(() => {
+    // INITIALISE SIZE
+    cellWidth = Math.floor($("#container").width()/width)
+    cellHeight = cellWidth
+    $('#grid').css({
+        'margin-top': $('header').height()
+    });
+    $(".buttons button").on("click", () => {
+        $("html, body").stop().animate({scrollTop:0}, 500, 'swing');
+    })
+    buildDefaultImpactArea()
+    $("#impactArea1").on("click", () => {
+        $("section").each((index, element) => {
+            let x = $(element).attr("x")
+            let y = $(element).attr("y")
+            animateOutBlock(x,y)
+        });
+        buildDefaultImpactArea()
+    })
+    $("#impactArea2").on("click", () => {
+        $("section").each((index, element) => {
+            let x = $(element).attr("x")
+            let y = $(element).attr("y")
+            animateOutBlock(x,y)
+        });
+        setTimeout(() => {
+            $("#grid").html("")
+            createBlock(2,0,1,"#827184");
+            createBlock(1,1,2,"#2436FF");
+            createBlock(3,1,1,"#FF4F00");
+            createBlock(1,5,2,"#FFCBD4");
+            createBlock(2,5,1,"transparent", circle("#FF4F00", 1));
+        }, duration)
+    })
+    $("#impactArea3").on("click", () => {
+        $("section").each((index, element) => {
+            let x = $(element).attr("x")
+            let y = $(element).attr("y")
+            animateOutBlock(x,y)
+        });
+        setTimeout(() => {
+            $("#grid").html("")
+            createBlock(4,2,1,"#827184");
+            createBlock(3,3,2,"#2436FF");
+            createBlock(1,1,2,"#FF4F00");
+            createBlock(0,5,1,"#FFCBD4");
+            createBlock(2,4,1,"transparent", circle("#FF4F00", 1));
+        }, duration)
+    })
+})
+</script>
+
